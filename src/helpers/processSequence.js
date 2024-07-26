@@ -46,14 +46,18 @@
  const tapWriteLog =(val) => R.tap(writeLog, val); 
  const handleValidationError = () => handleError('ValidationError');
 
- const processGetAnimal = R.pipe(
+ const processMath = R.pipe(
     tapWriteLog,
     R.length,
     tapWriteLog,
     square,
     tapWriteLog,
     modulo,
-    tapWriteLog,
+    tapWriteLog
+)
+
+ const processGetAnimal = R.pipe(
+    processMath,
     getAnimal, 
     R.otherwise(handleError),
     R.andThen(
@@ -62,6 +66,7 @@
         )
     )
 )
+
 
  const processRequests = R.pipe (
     toNumber,
@@ -75,7 +80,8 @@
     )
 )
 
- const processValue = R.pipe(tapWriteLog,
+ const processValue = R.pipe(
+   tapWriteLog,
    R.ifElse(validate, processRequests, handleValidationError)
    );
 
