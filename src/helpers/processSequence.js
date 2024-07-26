@@ -15,37 +15,71 @@
  * Ответ будет приходить в поле {result}
  */
  import Api from '../tools/api';
+ import * as R from 'ramda';
 
  const api = new Api();
 
- /**
-  * Я – пример, удали меня
-  */
- const wait = time => new Promise(resolve => {
-     setTimeout(resolve, time);
- })
+ const lessThan10 = R.pipe(R.split(''), R.length, R.gt(10));
+ const moreThan2 = R.pipe(R.split(''), R.length, R.lt(2));
+ const isPositiveNum  =R.pipe(R.startsWith('-'), R.not)
+ const isNumber = R.pipe(R.add(0), R.type, R.equals('Number'));
+ const validate = R.allPass([lessThan10, moreThan2, isPositiveNum, isNumber]);
+ const toNumber = R.pipe(parseFloat, Math.round);
+ const square = (num) => R.product([num, num]);
+ const modulo = (num) => R.modulo(num, 3)
+ const params = (number) => ({
+   from: 10,
+   to: 2,
+   number,
+ });
+ 
+ const getNumber = (number) =>
+   api.get('https://api.tech/numbers/base', params(number))
+    
+ 
+ const getAnimal = (id) =>
+   api.get(`https://animals.tech/${id}`, id)
+ 
+ 
+ const processSequence = ({ value, writeLog, handleSuccess, handleError }) => {
 
- const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-     /**
-      * Я – пример, удали меня
-      */
-     writeLog(value);
+ const tapWriteLog =(val) => R.tap(writeLog, val); 
+ const handleValidationError = () => handleError('ValidationError');
 
-     api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '01011010101'}).then(({result}) => {
-         writeLog(result);
-     });
+ const processGetAnimal = R.pipe(
+    tapWriteLog,
+    R.length,
+    tapWriteLog,
+    square,
+    tapWriteLog,
+    modulo,
+    tapWriteLog,
+    getAnimal, 
+    R.otherwise(handleError),
+    R.andThen(
+        R.when(R.has('result'),
+        R.pipe(R.prop('result'), handleSuccess)
+        )
+    )
+)
 
-     wait(2500).then(() => {
-         writeLog('SecondLog')
+ const processRequests = R.pipe (
+    toNumber,
+    tapWriteLog,
+    getNumber,
+    R.otherwise(handleError),
+    R.andThen(
+        R.when(R.has('result'),
+        R.pipe(R.prop('result'), processGetAnimal)
+        )
+    )
+)
 
-         return wait(1500);
-     }).then(() => {
-         writeLog('ThirdLog');
+ const processValue = R.pipe(tapWriteLog,
+   R.ifElse(validate, processRequests, handleValidationError)
+   );
 
-         return wait(400);
-     }).then(() => {
-         handleSuccess('Done');
-     });
- }
+ processValue(value);
+    }
 
 export default processSequence;

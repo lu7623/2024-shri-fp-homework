@@ -1,19 +1,3 @@
-const R = require('ramda');
-
-const isColor = (color, shape) => R.propEq(shape, color);
-const isRed =  R.partial(isColor, ['red']);
-const isGreen =  R.partial(isColor, ['green']);
-const isWhite =  R.partial(isColor, ['white']);
-const isBlue =  R.partial(isColor, ['blue']);
-const isOrange =  R.partial(isColor, ['orange']);
-const filterColor = (color, object) => R.filter(R.equals(color), object);
-const colorLength = (color) => {
-    const colorShape = R.partial(filterColor, [color])
-    const length = R.pipe(R.keys, R.length)
-    return R.pipe(colorShape, length)
-}
-
-
 /**
  * @file Домашка по FP ч. 1
  *
@@ -28,6 +12,22 @@ const colorLength = (color) => {
  *
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
+
+import * as R from 'ramda';
+
+const isColor = (color, shape) => R.propEq(shape, color);
+const isRed =  R.partial(isColor, ['red']);
+const isGreen =  R.partial(isColor, ['green']);
+const isWhite =  R.partial(isColor, ['white']);
+const isBlue =  R.partial(isColor, ['blue']);
+const isOrange =  R.partial(isColor, ['orange']);
+const filterColor = (color, object) => R.filter(R.equals(color), object);
+const colorLength = (color) => {
+    const colorShape = R.partial(filterColor, [color])
+    const length = R.pipe(R.keys, R.length)
+    return R.pipe(colorShape, length)
+}
+
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
 export const validateFieldN1 = (shapes) => {
