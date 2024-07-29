@@ -21,8 +21,8 @@
 
  const lessThan10 = R.pipe(R.split(''), R.length, R.gt(10));
  const moreThan2 = R.pipe(R.split(''), R.length, R.lt(2));
- const isPositiveNum  =R.pipe(R.startsWith('-'), R.not)
- const isNumber = R.pipe(R.add(0), R.type, R.equals('Number'));
+ const isPositiveNum  =R.pipe(R.startsWith('-'), R.not);
+ const isNumber =  R.test(/^-?\d+\.?\d*$/);
  const validate = R.allPass([lessThan10, moreThan2, isPositiveNum, isNumber]);
  const toNumber = R.pipe(parseFloat, Math.round);
  const square = (num) => R.product([num, num]);
